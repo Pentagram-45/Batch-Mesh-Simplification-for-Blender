@@ -1,4 +1,5 @@
 import bpy
+import os
 import re
 
 from bpy.types import Operator
@@ -14,11 +15,9 @@ from .utils import (
     build_filename,
 )
 
-
-
-# ========================================================
-# 添加一个LOD
-# ========================================================
+#----------------------------------------
+#Add LOD level
+#----------------------------------------
 
 class BMS_OT_level_add(Operator):
 
@@ -41,10 +40,9 @@ class BMS_OT_level_add(Operator):
 
         return {'FINISHED'}
 
-
-# ========================================================
-# 删除LOD
-# ========================================================
+#----------------------------------------
+#Delete LOD level
+#----------------------------------------
 
 class BMS_OT_level_remove(Operator):
 
@@ -54,31 +52,24 @@ class BMS_OT_level_remove(Operator):
 
     @classmethod
     def poll(cls, context):
-
         return len(context.scene.bms.levels) > 0
 
     def execute(self, context):
-
         props = context.scene.bms
-
         index = props.level_index
 
         if index < 0:
-
             return {'CANCELLED'}
 
         if index >= len(props.levels):
-
             return {'CANCELLED'}
 
         props.levels.remove(index)
 
         if len(props.levels) == 0:
-
             props.level_index = 0
 
         else:
-
             props.level_index = min(
                 index,
                 len(props.levels) - 1
@@ -86,10 +77,9 @@ class BMS_OT_level_remove(Operator):
 
         return {'FINISHED'}
 
-
-# ========================================================
-# 上下移动LOD
-# ========================================================
+#----------------------------------------
+#Move LOD level
+#----------------------------------------
 
 class BMS_OT_level_move(Operator):
 
@@ -105,40 +95,28 @@ class BMS_OT_level_move(Operator):
 
     @classmethod
     def poll(cls, context):
-
         return len(context.scene.bms.levels) > 1
 
     def execute(self, context):
-
         props = context.scene.bms
-
         index = props.level_index
-
         if self.direction == 'UP':
-
             if index <= 0:
-
                 return {'CANCELLED'}
-
             props.levels.move(index, index - 1)
-
             props.level_index -= 1
-
         else:
-
             if index >= len(props.levels) - 1:
-
                 return {'CANCELLED'}
 
             props.levels.move(index, index + 1)
-
             props.level_index += 1
 
         return {'FINISHED'}
 
-# ========================================================
-# Quick Add
-# ========================================================
+# ----------------------------------------
+# Quick add preset LODs
+# ----------------------------------------
 
 class BMS_OT_quick_add(Operator):
 
@@ -146,97 +124,66 @@ class BMS_OT_quick_add(Operator):
     bl_label = "Quick Add"
     bl_description = "Add LOD levels from text"
 
-    # -------------------------
-    # 解析一个字符串
-    # -------------------------
+    # ---------------------------------------------
+    # Parse string input
+    # ---------------------------------------------
 
     def parse_token(self, token):
-
         token = token.strip().lower()
 
         if token == "":
             return None
 
-        # 50%
-
+        #percentage parse
         if token.endswith("%"):
-
             try:
                 value = float(token[:-1])
             except ValueError:
                 return None
 
-            return (
-                "PERCENT",
-                value
-            )
+            return ("PERCENT",value)
 
-        # 10k
-
+        #thousand parse
         if token.endswith("k"):
-
             try:
                 value = float(token[:-1]) * 1000
             except ValueError:
                 return None
 
-            return (
-                "TRIS",
-                int(value)
-            )
+            return ("TRIS",int(value))
 
-        # 2m
-
+        #million parse
         if token.endswith("m"):
-
             try:
                 value = float(token[:-1]) * 1000000
             except ValueError:
                 return None
 
-            return (
-                "TRIS",
-                int(value)
-            )
+            return ("TRIS",int(value))
 
-        # 普通数字
-
+        #other numbers
         try:
-
             value = float(token)
 
         except ValueError:
-
             return None
 
-        # Ratio
-
+        #ratio parse
         if 0.0 <= value <= 1.0:
+            return ("RATIO",value)
 
-            return (
-                "RATIO",
-                value
-            )
+        #triangle Count
+        return ("TRIS",int(value))
 
-        # Triangle Count
-
-        return (
-            "TRIS",
-            int(value)
-        )
-
-    # -------------------------
+    # --------------------------------------------------
     # Execute
-    # -------------------------
+    # --------------------------------------------------
 
     def execute(self, context):
-
         props = context.scene.bms
-
         text = props.quick_add_text
 
         if text.strip() == "":
-
             self.report(
                 {'WARNING'},
                 "Input is empty."
@@ -247,47 +194,32 @@ class BMS_OT_quick_add(Operator):
         count = 0
 
         for token in text.split(","):
-
             parsed = self.parse_token(token)
 
             if parsed is None:
                 continue
 
             mode, value = parsed
-
             item = props.levels.add()
-
             item.mode = mode
 
             if mode == "TRIS":
-
                 item.target_tris = int(value)
-
             elif mode == "PERCENT":
-
                 item.target_percent = float(value)
-
             else:
-
                 item.target_ratio = float(value)
 
             count += 1
 
         if count == 0:
-
-            self.report(
-                {'WARNING'},
-                "No valid level found."
-            )
+            self.report({'WARNING'}, "No valid level found.")
 
             return {'CANCELLED'}
 
         props.level_index = len(props.levels) - 1
 
-        self.report(
-            {'INFO'},
-            f"Added {count} LOD level(s)."
-        )
+        self.report({'INFO'}, f"Added {count} LOD level(s).")
 
         return {'FINISHED'}
 
@@ -299,195 +231,96 @@ class BMS_OT_run(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     # ----------------------------------------------------
-    # 获取处理目标
+    # Get target object(s)
     # ----------------------------------------------------
 
     def get_targets(self, context):
-
         props = context.scene.bms
 
         if props.use_collection and props.collection:
-
-            return [
-                obj
-                for obj in props.collection.objects
-                if obj.type == 'MESH'
-            ]
+            return [obj for obj in props.collection.objects if obj.type == 'MESH']
 
         if props.use_selected:
+            return [obj for obj in context.selected_objects if obj.type == 'MESH']
 
-            return [
-                obj
-                for obj in context.selected_objects
-                if obj.type == 'MESH'
-            ]
-
-        return [
-            obj
-            for obj in context.scene.objects
-            if obj.type == 'MESH'
-        ]
+        return [obj for obj in context.scene.objects if obj.type == 'MESH']
 
     # ----------------------------------------------------
     # Execute
     # ----------------------------------------------------
 
     def execute(self, context):
-
         props = context.scene.bms
 
         if not props.export_dir:
-
-            self.report(
-                {'ERROR'},
-                "Please choose an export folder."
-            )
-
+            self.report({'ERROR'}, "Please choose an export folder.")
             return {'CANCELLED'}
 
         if len(props.levels) == 0:
-
-            self.report(
-                {'ERROR'},
-                "No LOD level."
-            )
-
+            self.report({'ERROR'}, "No LOD level.")
             return {'CANCELLED'}
 
         targets = self.get_targets(context)
 
         if len(targets) == 0:
-
-            self.report(
-                {'WARNING'},
-                "No mesh found."
-            )
-
+            self.report({'WARNING'}, "No mesh found.")
             return {'CANCELLED'}
 
-        export_dir = ensure_directory(
-            props.export_dir
-        )
-
+        export_dir = ensure_directory(props.export_dir)
         view_layer = context.view_layer
-
         old_active = view_layer.objects.active
-
         old_selection = list(context.selected_objects)
-
         exported = 0
 
         try:
-
             for obj in targets:
-
                 base_tris = get_triangle_count(obj)
-
-                for index, level in enumerate(
-                        props.levels,
-                        start=1):
-
+                for index, level in enumerate(props.levels, start=1):
                     ratio = level.get_ratio(base_tris)
-
-                    lod = create_lod_copy(
-                        obj,
-                        ratio,
-                        f"LOD{index}"
-                    )
+                    lod = create_lod_copy(obj, ratio, f"LOD{index}")
 
                     lod_tris = get_triangle_count(lod)
 
-                    filename = build_filename(
+                    filename = build_filename(props.filename_pattern, obj.name, index, lod_tris)
 
-                        props.filename_pattern,
+                    filepath = os.path.join(export_dir, filename)
 
-                        obj.name,
+                    filepath = ensure_obj_extension(filepath)
 
-                        index,
-
-                        lod_tris
-
-                    )
-
-                    filepath = os.path.join(
-
-                        export_dir,
-
-                        filename
-
-                    )
-
-                    filepath = ensure_obj_extension(
-                        filepath
-                    )
-
-                    export_obj(
-
-                        lod,
-
-                        filepath
-
-                    )
-
+                    export_obj(lod,filepath)
                     delete_object(lod)
-
                     exported += 1
 
         except Exception as e:
-
-            self.report(
-                {'ERROR'},
-                str(e)
-            )
-
+            self.report({'ERROR'}, str(e))
             return {'CANCELLED'}
 
         finally:
-
-            bpy.ops.object.select_all(
-                action='DESELECT'
-            )
+            bpy.ops.object.select_all(action='DESELECT')
 
             for obj in old_selection:
-
                 if obj.name in bpy.data.objects:
-
                     obj.select_set(True)
-
             view_layer.objects.active = old_active
 
-        self.report(
-            {'INFO'},
-            f"Exported {exported} mesh(es)."
-        )
+        self.report({'INFO'}, f"Exported {exported} mesh(es).")
 
         return {'FINISHED'}
 
 
 classes = (
-
     BMS_OT_level_add,
-
     BMS_OT_level_remove,
-
     BMS_OT_level_move,
-
     BMS_OT_quick_add,
-
     BMS_OT_run,
-
 )
 
-
 def register_operators():
-
     for cls in classes:
-
         bpy.utils.register_class(cls)
 
 
 def unregister_operators():
-
     for cls in reversed(classes):
-
         bpy.utils.unregister_class(cls)

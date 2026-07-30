@@ -13,9 +13,9 @@ from bpy.props import (
 )
 
 
-# --------------------------------------------------------
-# 单个LOD设置
-# --------------------------------------------------------
+#----------------------------------------
+# Single LOD settings
+#----------------------------------------
 
 class BMSLevel(PropertyGroup):
 
@@ -51,18 +51,11 @@ class BMSLevel(PropertyGroup):
     )
 
     def get_ratio(self, base_tris: int):
-
         if base_tris <= 0:
             return 1.0
 
         if self.mode == "TRIS":
-            return max(
-                0.0,
-                min(
-                    1.0,
-                    self.target_tris / float(base_tris)
-                )
-            )
+            return max(0.0, min(1.0, self.target_tris / float(base_tris)))
 
         elif self.mode == "PERCENT":
             return self.target_percent / 100.0
@@ -71,9 +64,9 @@ class BMSLevel(PropertyGroup):
             return self.target_ratio
 
 
-# --------------------------------------------------------
-# 插件设置
-# --------------------------------------------------------
+#----------------------------------------
+# Addon settings
+#----------------------------------------
 
 class BMSProperties(PropertyGroup):
 
@@ -116,9 +109,9 @@ class BMSProperties(PropertyGroup):
     )
 
 
-# --------------------------------------------------------
-# 注册
-# --------------------------------------------------------
+#----------------------------------------
+# Register & Unregister
+#----------------------------------------
 
 classes = (
     BMSLevel,
@@ -127,17 +120,13 @@ classes = (
 
 
 def register_props():
-
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.bms = PointerProperty(
-        type=BMSProperties
-    )
+    bpy.types.Scene.bms = PointerProperty(type=BMSProperties)
 
 
 def unregister_props():
-
     del bpy.types.Scene.bms
 
     for cls in reversed(classes):
