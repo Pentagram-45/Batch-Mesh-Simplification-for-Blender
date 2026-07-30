@@ -25,6 +25,7 @@ This add-on is **best for**:
 - Background environment assets
 - Models with low topological precision requirements (such as rocks or ruins)
 - Rapid prototyping
+
 It is **not recommended** for rigged characters with complex skinning animations or "Hero Assets" requiring precise hard-surface normals. Because the tool relies on Blender's native Decimate function, it may compromise specific topology that requires manual retopology.
 
 ## Future development
