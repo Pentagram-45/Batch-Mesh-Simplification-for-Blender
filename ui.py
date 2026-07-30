@@ -6,9 +6,9 @@ from bpy.types import (
 )
 
 
-#----------------------------------------
+# ----------------------------------------
 # LOD List
-#----------------------------------------
+# ----------------------------------------
 
 class BMS_UL_levels(UIList):
 
@@ -37,9 +37,9 @@ class BMS_UL_levels(UIList):
             row.prop(item, "target_ratio", text="")
 
 
-#----------------------------------------
+# ----------------------------------------
 # Main Panel
-#----------------------------------------
+# ----------------------------------------
 
 class BMS_PT_main(Panel):
 
@@ -54,18 +54,18 @@ class BMS_PT_main(Panel):
 
         props = context.scene.bms
 
-        #----------------------------------------
+        # ----------------------------------------
         # Export
-        #----------------------------------------
+        # ----------------------------------------
 
         box = layout.box()
         box.label(text="Export", icon='EXPORT')
         box.prop(props, "export_dir")
         box.prop(props, "filename_pattern")
 
-        #----------------------------------------
+        # ----------------------------------------
         # Target objects(s)
-        #----------------------------------------
+        # ----------------------------------------
 
         box = layout.box()
         box.label(text="Target", icon='OUTLINER_COLLECTION')
@@ -75,9 +75,9 @@ class BMS_PT_main(Panel):
         if props.use_collection:
             box.prop(props, "collection")
 
-        #----------------------------------------
+        # ----------------------------------------
         # LOD
-        #----------------------------------------
+        # ----------------------------------------
 
         box = layout.box()
         box.label(text="LOD Levels", icon='MOD_DECIM')
@@ -95,25 +95,25 @@ class BMS_PT_main(Panel):
         op = col.operator("bms.level_move", icon='TRIA_DOWN', text="")
         op.direction = 'DOWN'
 
-        #----------------------------------------
+        # ----------------------------------------
         # Quick add
-        #----------------------------------------
+        # ----------------------------------------
 
         box.separator()
         box.prop(props, "quick_add_text")
         box.operator("bms.quick_add", icon='PLUS')
 
-        #----------------------------------------
+        # ----------------------------------------
         # Run
-        #----------------------------------------
+        # ----------------------------------------
 
         layout.separator()
         layout.scale_y = 1.6
         layout.operator("bms.run", icon='FILE_TICK')
 
-#----------------------------------------
-#Register & Unregister
-#----------------------------------------
+# ----------------------------------------
+# Register & Unregister
+# ----------------------------------------
 
 classes = (
     BMS_UL_levels,

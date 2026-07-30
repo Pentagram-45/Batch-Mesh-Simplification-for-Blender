@@ -15,9 +15,9 @@ from .utils import (
     build_filename,
 )
 
-#----------------------------------------
-#Add LOD level
-#----------------------------------------
+# ----------------------------------------
+# Add LOD level
+# ----------------------------------------
 
 class BMS_OT_level_add(Operator):
 
@@ -40,9 +40,9 @@ class BMS_OT_level_add(Operator):
 
         return {'FINISHED'}
 
-#----------------------------------------
-#Delete LOD level
-#----------------------------------------
+# ----------------------------------------
+# Delete LOD level
+# ----------------------------------------
 
 class BMS_OT_level_remove(Operator):
 
@@ -77,9 +77,9 @@ class BMS_OT_level_remove(Operator):
 
         return {'FINISHED'}
 
-#----------------------------------------
-#Move LOD level
-#----------------------------------------
+# ----------------------------------------
+# Move LOD level
+# ----------------------------------------
 
 class BMS_OT_level_move(Operator):
 
@@ -307,6 +307,9 @@ class BMS_OT_run(Operator):
 
         return {'FINISHED'}
 
+# ----------------------------------------
+# Register & Unregister
+# ----------------------------------------
 
 classes = (
     BMS_OT_level_add,

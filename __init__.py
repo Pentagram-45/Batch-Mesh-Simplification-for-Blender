@@ -2,7 +2,7 @@ bl_info = {
     "name": "Batch Mesh Simplification",
     "author": "Pentagram-45",
     "version": (1, 0, 0),
-    "blender": (4, 5, 0),
+    "blender": (5, 2, 0),
     "location": "View3D > Sidebar > BMS",
     "description": "Batch simplify meshes and export LOD models",
     "category": "Object",
