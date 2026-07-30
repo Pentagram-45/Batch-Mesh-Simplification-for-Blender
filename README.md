@@ -14,10 +14,10 @@ You can select the export directory and customize the file naming convention. Th
 ### LOD settings
 The LOD settings provide three representations for your target simplification: **Triangle Count**, **Percentage**, and **Ratio**. You can create each level manually or use the Quick Add feature to generate multiple levels in a single command.
 The default Quick Add command is 10k, 5k, 2k, 1k, which creates 4 levels of simplification containing 10,000, 5,000, 2,000, and 1,000 triangles, respectively. Quick Add automatically identifies the representation method based on your input format:
-- xxx**%**: percentage
-- 0.0-1.0: ratio
-- any integer number: triangle count
-- xxx***k*** / xxx***m***: thousand / million representation
+- **xxx%**: percentage
+- **0.0-1.0**: ratio
+- **any integer number**: triangle count
+- xxx**k** / xxx**m**: thousand / million representation
 
 ## Use case and limitations
 This add-on is **best for**:
